@@ -33,13 +33,9 @@ const memoryStatus = document.getElementById("memoryStatus");
 
 let isListening = false;
 let recognition = null;
-
 let memory = [];
-
 let chatHistory = [];
-
 let speechEnabled = true;
-
 let isThinking = false;
 
 
@@ -68,16 +64,14 @@ function bootSystem() {
       progress = 100;
     }
 
-    bootProgress.style.width =
-      `${progress}%`;
+    bootProgress.style.width = `${progress}%`;
 
     const index = Math.min(
       Math.floor(progress / 17),
       messages.length - 1
     );
 
-    bootStatus.textContent =
-      messages[index];
+    bootStatus.textContent = messages[index];
 
     if (progress >= 100) {
 
@@ -136,14 +130,11 @@ function loadMemory() {
   try {
 
     const saved =
-      localStorage.getItem(
-        "titan_memory"
-      );
+      localStorage.getItem("titan_memory");
 
     if (saved) {
 
-      memory =
-        JSON.parse(saved);
+      memory = JSON.parse(saved);
 
       memoryStatus.textContent =
         `${memory.length} ITEMS`;
@@ -221,8 +212,7 @@ function addMessage(sender, text) {
   content.className =
     "message-content";
 
-  content.textContent =
-    text;
+  content.textContent = text;
 
   message.appendChild(label);
   message.appendChild(content);
@@ -280,9 +270,7 @@ function speak(text) {
       "ONLINE";
   };
 
-  window.speechSynthesis.speak(
-    speech
-  );
+  window.speechSynthesis.speak(speech);
 }
 
 
@@ -312,26 +300,17 @@ function setupSpeechRecognition() {
   recognition =
     new SpeechRecognition();
 
-  recognition.lang =
-    "en-IN";
-
-  recognition.continuous =
-    false;
-
-  recognition.interimResults =
-    false;
-
-  recognition.maxAlternatives =
-    1;
+  recognition.lang = "en-IN";
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
 
 
   recognition.onstart = () => {
 
     isListening = true;
 
-    micBtn.classList.add(
-      "listening"
-    );
+    micBtn.classList.add("listening");
 
     micText.textContent =
       "LISTENING...";
@@ -355,9 +334,7 @@ function setupSpeechRecognition() {
     commandInput.value =
       transcript;
 
-    processCommand(
-      transcript
-    );
+    processCommand(transcript);
   };
 
 
@@ -386,9 +363,7 @@ function resetMicrophone() {
 
   isListening = false;
 
-  micBtn.classList.remove(
-    "listening"
-  );
+  micBtn.classList.remove("listening");
 
   micText.textContent =
     "TAP TO SPEAK";
@@ -480,9 +455,7 @@ function localCommand(command) {
   }
 
 
-  if (
-    command.includes("open youtube")
-  ) {
+  if (command.includes("open youtube")) {
 
     window.open(
       "https://www.youtube.com/",
@@ -493,9 +466,7 @@ function localCommand(command) {
   }
 
 
-  if (
-    command.includes("open google")
-  ) {
+  if (command.includes("open google")) {
 
     window.open(
       "https://www.google.com/",
@@ -506,9 +477,7 @@ function localCommand(command) {
   }
 
 
-  if (
-    command.startsWith("search ")
-  ) {
+  if (command.startsWith("search ")) {
 
     const query =
       command
@@ -523,16 +492,12 @@ function localCommand(command) {
         "_blank"
       );
 
-      return (
-        `Searching the web for ${query}.`
-      );
+      return `Searching the web for ${query}.`;
     }
   }
 
 
-  if (
-    command.includes("clear conversation")
-  ) {
+  if (command.includes("clear conversation")) {
 
     conversation.innerHTML = "";
 
@@ -542,9 +507,7 @@ function localCommand(command) {
   }
 
 
-  if (
-    command.includes("system status")
-  ) {
+  if (command.includes("system status")) {
 
     return (
       "T.I.T.A.N. core is online. " +
@@ -566,17 +529,16 @@ async function askAI(message) {
 
   const response =
     await fetch(
-      "/api/chat",
+      "https://t-i-t-a-n.vercel.app/api/chat",
       {
         method: "POST",
 
         headers: {
-          "Content-Type":
-            "application/json"
+          "Content-Type": "application/json"
         },
 
         body: JSON.stringify({
-          message,
+          message: message,
           history: chatHistory
         })
       }
@@ -607,9 +569,7 @@ async function askAI(message) {
    MAIN COMMAND PROCESSOR
 ========================================== */
 
-async function processCommand(
-  rawCommand
-) {
+async function processCommand(rawCommand) {
 
   const command =
     rawCommand.trim();
@@ -712,14 +672,14 @@ async function processCommand(
     );
 
 
-    const message =
+    const errorMessage =
       "I couldn't connect to my AI core right now. " +
       "Please check the backend configuration and try again.";
 
 
     addMessage(
       "titan",
-      message
+      errorMessage
     );
 
 
@@ -729,7 +689,7 @@ async function processCommand(
     assistantStatus.textContent =
       "AI connection error.";
 
-    speak(message);
+    speak(errorMessage);
   }
 
 
@@ -753,7 +713,7 @@ sendBtn.addEventListener(
 
 
 /* ==========================================
-   ENTER KEY
+   ENTER
 ========================================== */
 
 commandInput.addEventListener(
@@ -790,9 +750,7 @@ document
         commandInput.value =
           command;
 
-        processCommand(
-          command
-        );
+        processCommand(command);
       }
     );
   });
