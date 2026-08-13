@@ -1,85 +1,61 @@
 "use strict";
 
 /* ==========================================
-   T.I.T.A.N. V1
-   Tactical Intelligence & Technology
-   Assistant Network
+   T.I.T.A.N. V2
+   AI + VOICE + LOCAL COMMAND ENGINE
 ========================================== */
+
+const bootScreen = document.getElementById("bootScreen");
+const bootProgress = document.getElementById("bootProgress");
+const bootStatus = document.getElementById("bootStatus");
+
+const app = document.getElementById("app");
+const systemTime = document.getElementById("systemTime");
+
+const commandInput = document.getElementById("commandInput");
+const sendBtn = document.getElementById("sendBtn");
+
+const micBtn = document.getElementById("micBtn");
+const micText = document.getElementById("micText");
+
+const conversation = document.getElementById("conversation");
+
+const coreState = document.getElementById("coreState");
+const assistantStatus = document.getElementById("assistantStatus");
+
+const voiceStatus = document.getElementById("voiceStatus");
+const memoryStatus = document.getElementById("memoryStatus");
 
 
 /* ==========================================
-   ELEMENTS
-========================================== */
-
-const bootScreen =
-  document.getElementById("bootScreen");
-
-const bootProgress =
-  document.getElementById("bootProgress");
-
-const bootStatus =
-  document.getElementById("bootStatus");
-
-const app =
-  document.getElementById("app");
-
-const systemTime =
-  document.getElementById("systemTime");
-
-const commandInput =
-  document.getElementById("commandInput");
-
-const sendBtn =
-  document.getElementById("sendBtn");
-
-const micBtn =
-  document.getElementById("micBtn");
-
-const micText =
-  document.getElementById("micText");
-
-const conversation =
-  document.getElementById("conversation");
-
-const coreState =
-  document.getElementById("coreState");
-
-const assistantStatus =
-  document.getElementById("assistantStatus");
-
-const voiceStatus =
-  document.getElementById("voiceStatus");
-
-const memoryStatus =
-  document.getElementById("memoryStatus");
-
-
-/* ==========================================
-   SYSTEM STATE
+   STATE
 ========================================== */
 
 let isListening = false;
-
 let recognition = null;
 
 let memory = [];
 
+let chatHistory = [];
+
 let speechEnabled = true;
+
+let isThinking = false;
 
 
 /* ==========================================
-   BOOT SYSTEM
+   BOOT
 ========================================== */
 
 function bootSystem() {
 
   let progress = 0;
 
-  const bootMessages = [
+  const messages = [
     "POWERING CORE...",
     "LOADING NEURAL ENGINE...",
     "INITIALIZING VOICE SYSTEM...",
-    "CHECKING COMMAND MODULES...",
+    "CONNECTING AI SYSTEM...",
     "LOADING MEMORY...",
     "SYSTEM READY..."
   ];
@@ -93,16 +69,15 @@ function bootSystem() {
     }
 
     bootProgress.style.width =
-      progress + "%";
+      `${progress}%`;
 
-    const messageIndex =
-      Math.min(
-        Math.floor(progress / 17),
-        bootMessages.length - 1
-      );
+    const index = Math.min(
+      Math.floor(progress / 17),
+      messages.length - 1
+    );
 
     bootStatus.textContent =
-      bootMessages[messageIndex];
+      messages[index];
 
     if (progress >= 100) {
 
@@ -111,21 +86,18 @@ function bootSystem() {
       setTimeout(() => {
 
         bootScreen.classList.add("hidden");
-
         app.classList.remove("hidden");
 
-        coreState.textContent =
-          "ONLINE";
+        coreState.textContent = "ONLINE";
 
         assistantStatus.textContent =
-          "All primary systems are operational.";
+          "AI systems are ready.";
 
         loadMemory();
-
         updateTime();
 
         speak(
-          "T.I.T.A.N. online. Systems operational."
+          "T.I.T.A.N. online. AI systems ready."
         );
 
       }, 700);
@@ -182,24 +154,18 @@ function loadMemory() {
 
       memoryStatus.textContent =
         "LOCAL";
-
     }
 
   } catch (error) {
 
-    console.error(
-      "Memory error:",
-      error
-    );
+    console.error(error);
 
+    memory = [];
   }
 }
 
 
-function saveMemory(
-  userText,
-  titanText
-) {
+function saveMemory(userText, titanText) {
 
   memory.push({
     user: userText,
@@ -225,10 +191,7 @@ function saveMemory(
    CHAT UI
 ========================================== */
 
-function addMessage(
-  sender,
-  text
-) {
+function addMessage(sender, text) {
 
   const message =
     document.createElement("div");
@@ -262,7 +225,6 @@ function addMessage(
     text;
 
   message.appendChild(label);
-
   message.appendChild(content);
 
   conversation.appendChild(message);
@@ -282,9 +244,8 @@ function speak(text) {
     return;
   }
 
-  if (
-    !("speechSynthesis" in window)
-  ) {
+  if (!("speechSynthesis" in window)) {
+
     voiceStatus.textContent =
       "NOT SUPPORTED";
 
@@ -297,11 +258,8 @@ function speak(text) {
     new SpeechSynthesisUtterance(text);
 
   speech.lang = "en-IN";
-
   speech.rate = 0.95;
-
   speech.pitch = 0.85;
-
   speech.volume = 1;
 
   speech.onstart = () => {
@@ -311,7 +269,6 @@ function speak(text) {
 
     coreState.textContent =
       "SPEAKING";
-
   };
 
   speech.onend = () => {
@@ -321,7 +278,6 @@ function speak(text) {
 
     coreState.textContent =
       "ONLINE";
-
   };
 
   window.speechSynthesis.speak(
@@ -388,46 +344,40 @@ function setupSpeechRecognition() {
 
     assistantStatus.textContent =
       "I am listening.";
-
   };
 
 
-  recognition.onresult =
-    (event) => {
+  recognition.onresult = event => {
 
-      const transcript =
-        event.results[0][0].transcript;
+    const transcript =
+      event.results[0][0].transcript;
 
-      commandInput.value =
-        transcript;
+    commandInput.value =
+      transcript;
 
-      processCommand(
-        transcript
-      );
-
-    };
+    processCommand(
+      transcript
+    );
+  };
 
 
-  recognition.onerror =
-    (event) => {
+  recognition.onerror = event => {
 
-      console.error(
-        "Speech error:",
-        event.error
-      );
+    console.error(
+      "Speech error:",
+      event.error
+    );
 
-      resetMicrophone();
+    resetMicrophone();
 
-      assistantStatus.textContent =
-        "Voice input error. Please try again.";
-
-    };
+    assistantStatus.textContent =
+      "Voice input error.";
+  };
 
 
   recognition.onend = () => {
 
     resetMicrophone();
-
   };
 }
 
@@ -450,14 +400,9 @@ function resetMicrophone() {
     "ONLINE";
 
   assistantStatus.textContent =
-    "Voice and command systems ready.";
-
+    "AI systems are ready.";
 }
 
-
-/* ==========================================
-   MICROPHONE BUTTON
-========================================== */
 
 micBtn.addEventListener(
   "click",
@@ -486,139 +431,25 @@ micBtn.addEventListener(
     } catch (error) {
 
       console.error(error);
-
     }
-
   }
 );
 
 
 /* ==========================================
-   COMMAND PROCESSOR
+   LOCAL COMMANDS
 ========================================== */
 
-function processCommand(
-  rawCommand
-) {
-
-  const command =
-    rawCommand
-      .trim()
-      .toLowerCase();
-
-  if (!command) {
-    return;
-  }
-
-  addMessage(
-    "user",
-    rawCommand
-  );
-
-  commandInput.value = "";
-
-  coreState.textContent =
-    "THINKING";
-
-  assistantStatus.textContent =
-    "Processing your command...";
-
-
-  setTimeout(() => {
-
-    const response =
-      generateResponse(command);
-
-    addMessage(
-      "titan",
-      response
-    );
-
-    saveMemory(
-      rawCommand,
-      response
-    );
-
-    coreState.textContent =
-      "ONLINE";
-
-    assistantStatus.textContent =
-      "Command processed.";
-
-    speak(response);
-
-  }, 450);
-}
-
-
-/* ==========================================
-   AI RESPONSE ENGINE
-========================================== */
-
-function generateResponse(
-  command
-) {
-
-  /* Greeting */
+function localCommand(command) {
 
   if (
-    command.includes("hello") ||
-    command.includes("hi") ||
-    command.includes("hey") ||
-    command.includes("namaste")
+    command.includes("what time") ||
+    command === "time"
   ) {
-
-    return (
-      "Hello. T.I.T.A.N. is online and ready."
-    );
-  }
-
-
-  /* Identity */
-
-  if (
-    command.includes("who are you") ||
-    command.includes("what are you") ||
-    command.includes("about yourself")
-  ) {
-
-    return (
-      "I am T.I.T.A.N., your personal AI assistant. " +
-      "My system is being developed with voice control, " +
-      "command execution, web intelligence, memory and automation."
-    );
-  }
-
-
-  /* Capabilities */
-
-  if (
-    command.includes("what can you do") ||
-    command.includes("capabilities") ||
-    command.includes("what do you do")
-  ) {
-
-    return (
-      "I can understand commands, respond using voice, " +
-      "remember local conversation data, perform basic tasks, " +
-      "and will later connect to advanced AI and external tools."
-    );
-  }
-
-
-  /* Time */
-
-  if (
-    command.includes("time") ||
-    command.includes("what time")
-  ) {
-
-    const now =
-      new Date();
 
     return (
       "The current time is " +
-      now.toLocaleTimeString(
+      new Date().toLocaleTimeString(
         "en-IN",
         {
           hour: "numeric",
@@ -629,19 +460,14 @@ function generateResponse(
   }
 
 
-  /* Date */
-
   if (
-    command.includes("date") ||
-    command.includes("today")
+    command.includes("today") ||
+    command.includes("date")
   ) {
-
-    const now =
-      new Date();
 
     return (
       "Today is " +
-      now.toLocaleDateString(
+      new Date().toLocaleDateString(
         "en-IN",
         {
           weekday: "long",
@@ -654,61 +480,6 @@ function generateResponse(
   }
 
 
-  /* Status */
-
-  if (
-    command.includes("system status") ||
-    command.includes("status")
-  ) {
-
-    return (
-      "All primary systems are operational. " +
-      "Core online. Voice ready. Local memory active."
-    );
-  }
-
-
-  /* Memory */
-
-  if (
-    command.includes("memory") ||
-    command.includes("remember")
-  ) {
-
-    return (
-      `I currently have ${memory.length} local conversation records in memory.`
-    );
-  }
-
-
-  /* Joke */
-
-  if (
-    command.includes("joke")
-  ) {
-
-    return (
-      "Why did the computer get cold? " +
-      "Because it left its Windows open."
-    );
-  }
-
-
-  /* Thank you */
-
-  if (
-    command.includes("thank") ||
-    command.includes("thanks")
-  ) {
-
-    return (
-      "You're welcome. Always ready."
-    );
-  }
-
-
-  /* Open YouTube */
-
   if (
     command.includes("open youtube")
   ) {
@@ -718,13 +489,9 @@ function generateResponse(
       "_blank"
     );
 
-    return (
-      "Opening YouTube."
-    );
+    return "Opening YouTube.";
   }
 
-
-  /* Open Google */
 
   if (
     command.includes("open google")
@@ -735,29 +502,24 @@ function generateResponse(
       "_blank"
     );
 
-    return (
-      "Opening Google."
-    );
+    return "Opening Google.";
   }
 
-
-  /* Search command */
 
   if (
     command.startsWith("search ")
   ) {
 
     const query =
-      command.substring(7).trim();
+      command
+        .replace("search ", "")
+        .trim();
 
     if (query) {
 
-      const url =
-        "https://www.google.com/search?q=" +
-        encodeURIComponent(query);
-
       window.open(
-        url,
+        "https://www.google.com/search?q=" +
+        encodeURIComponent(query),
         "_blank"
       );
 
@@ -768,106 +530,215 @@ function generateResponse(
   }
 
 
-  /* Calculate */
-
-  if (
-    command.startsWith("calculate ")
-  ) {
-
-    const expression =
-      command
-        .replace(
-          "calculate ",
-          ""
-        )
-        .trim();
-
-    const result =
-      safeCalculate(
-        expression
-      );
-
-    if (result !== null) {
-
-      return (
-        `The result is ${result}.`
-      );
-    }
-
-    return (
-      "I could not safely calculate that expression."
-    );
-  }
-
-
-  /* Clear conversation */
-
   if (
     command.includes("clear conversation")
   ) {
 
     conversation.innerHTML = "";
 
+    chatHistory = [];
+
+    return "Conversation cleared.";
+  }
+
+
+  if (
+    command.includes("system status")
+  ) {
+
     return (
-      "Conversation cleared."
+      "T.I.T.A.N. core is online. " +
+      "Voice system is ready. " +
+      "AI backend is connected."
     );
   }
 
 
-  /* Unknown */
+  return null;
+}
+
+
+/* ==========================================
+   REAL AI REQUEST
+========================================== */
+
+async function askAI(message) {
+
+  const response =
+    await fetch(
+      "/api/chat",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          message,
+          history: chatHistory
+        })
+      }
+    );
+
+
+  const data =
+    await response.json();
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      data.error ||
+      "AI request failed"
+    );
+  }
+
 
   return (
-    "I understood your command, but this capability " +
-    "is not connected yet. In the next version, " +
-    "I will connect the advanced AI engine and external tools."
+    data.reply ||
+    "I couldn't generate a response."
   );
 }
 
 
 /* ==========================================
-   SAFE CALCULATOR
+   MAIN COMMAND PROCESSOR
 ========================================== */
 
-function safeCalculate(
-  expression
+async function processCommand(
+  rawCommand
 ) {
 
-  const cleaned =
-    expression.replace(
-      /[^0-9+\-*/().% ]/g,
-      ""
+  const command =
+    rawCommand.trim();
+
+  if (!command || isThinking) {
+    return;
+  }
+
+  addMessage(
+    "user",
+    command
+  );
+
+  commandInput.value = "";
+
+  const localResponse =
+    localCommand(
+      command.toLowerCase()
     );
 
-  if (!cleaned) {
-    return null;
+
+  if (localResponse) {
+
+    addMessage(
+      "titan",
+      localResponse
+    );
+
+    saveMemory(
+      command,
+      localResponse
+    );
+
+    speak(localResponse);
+
+    return;
   }
+
+
+  isThinking = true;
+
+  coreState.textContent =
+    "THINKING";
+
+  assistantStatus.textContent =
+    "T.I.T.A.N. is thinking...";
+
 
   try {
 
-    const result =
-      Function(
-        `"use strict"; return (${cleaned})`
-      )();
+    const reply =
+      await askAI(command);
 
-    if (
-      typeof result !== "number" ||
-      !Number.isFinite(result)
-    ) {
-      return null;
+
+    addMessage(
+      "titan",
+      reply
+    );
+
+
+    chatHistory.push({
+      role: "user",
+      content: command
+    });
+
+
+    chatHistory.push({
+      role: "assistant",
+      content: reply
+    });
+
+
+    if (chatHistory.length > 12) {
+
+      chatHistory =
+        chatHistory.slice(-12);
     }
 
-    return result;
+
+    saveMemory(
+      command,
+      reply
+    );
+
+
+    coreState.textContent =
+      "ONLINE";
+
+    assistantStatus.textContent =
+      "Response generated.";
+
+    speak(reply);
+
 
   } catch (error) {
 
-    return null;
+    console.error(
+      "T.I.T.A.N. AI error:",
+      error
+    );
 
+
+    const message =
+      "I couldn't connect to my AI core right now. " +
+      "Please check the backend configuration and try again.";
+
+
+    addMessage(
+      "titan",
+      message
+    );
+
+
+    coreState.textContent =
+      "ERROR";
+
+    assistantStatus.textContent =
+      "AI connection error.";
+
+    speak(message);
   }
+
+
+  isThinking = false;
 }
 
 
 /* ==========================================
-   SEND BUTTON
+   SEND
 ========================================== */
 
 sendBtn.addEventListener(
@@ -877,7 +748,6 @@ sendBtn.addEventListener(
     processCommand(
       commandInput.value
     );
-
   }
 );
 
@@ -888,18 +758,16 @@ sendBtn.addEventListener(
 
 commandInput.addEventListener(
   "keydown",
-  (event) => {
+  event => {
 
-    if (
-      event.key === "Enter"
-    ) {
+    if (event.key === "Enter") {
+
+      event.preventDefault();
 
       processCommand(
         commandInput.value
       );
-
     }
-
   }
 );
 
@@ -908,13 +776,9 @@ commandInput.addEventListener(
    QUICK COMMANDS
 ========================================== */
 
-const quickButtons =
-  document.querySelectorAll(
-    ".quick-btn"
-  );
-
-quickButtons.forEach(
-  (button) => {
+document
+  .querySelectorAll(".quick-btn")
+  .forEach(button => {
 
     button.addEventListener(
       "click",
@@ -929,12 +793,9 @@ quickButtons.forEach(
         processCommand(
           command
         );
-
       }
     );
-
-  }
-);
+  });
 
 
 /* ==========================================
@@ -943,12 +804,7 @@ quickButtons.forEach(
 
 document.addEventListener(
   "keydown",
-  (event) => {
-
-    /*
-      Space + CTRL
-      = voice activation
-    */
+  event => {
 
     if (
       event.ctrlKey &&
@@ -958,15 +814,13 @@ document.addEventListener(
       event.preventDefault();
 
       micBtn.click();
-
     }
-
   }
 );
 
 
 /* ==========================================
-   START SYSTEM
+   START
 ========================================== */
 
 setupSpeechRecognition();
