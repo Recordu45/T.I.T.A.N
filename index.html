@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+  >
+
+  <meta
+    name="theme-color"
+    content="#05070c"
+  >
+
+  <meta
+    name="description"
+    content="T.I.T.A.N. Advanced AI Personal Assistant"
+  >
+
+  <title>T.I.T.A.N. | Advanced AI Assistant</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- ================================
+       BOOT SCREEN
+  ================================= -->
+
+  <div id="bootScreen" class="boot-screen">
+
+    <div class="boot-logo">
+      T.I.T.A.N.
+    </div>
+
+    <div class="boot-subtitle">
+      TACTICAL INTELLIGENCE & TECHNOLOGY
+      ASSISTANT NETWORK
+    </div>
+
+    <div class="boot-loader">
+      <div id="bootProgress"></div>
+    </div>
+
+    <div id="bootStatus">
+      INITIALIZING SYSTEM...
+    </div>
+
+  </div>
+
+
+  <!-- ================================
+       MAIN APPLICATION
+  ================================= -->
+
+  <main id="app" class="app hidden">
+
+    <!-- TOP BAR -->
+
+    <header class="topbar">
+
+      <div class="brand">
+
+        <div class="brand-orb">
+          <span></span>
+        </div>
+
+        <div>
+          <div class="brand-title">
+            T.I.T.A.N.
+          </div>
+
+          <div class="brand-status">
+            <span class="status-dot"></span>
+            ONLINE
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="system-info">
+
+        <div id="systemTime">
+          00:00:00
+        </div>
+
+        <div>
+          SYSTEM READY
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- ================================
+         AI CORE
+    ================================= -->
+
+    <section class="ai-section">
+
+      <div class="ai-core-container">
+
+        <div class="core-ring ring-1"></div>
+        <div class="core-ring ring-2"></div>
+        <div class="core-ring ring-3"></div>
+
+        <div class="core-energy">
+
+          <div class="core-inner">
+
+            <div class="core-text">
+              T.I.T.A.N.
+            </div>
+
+            <div id="coreState">
+              STANDBY
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="assistant-message">
+
+        <div class="eyebrow">
+          ADVANCED PERSONAL AI
+        </div>
+
+        <h1 id="welcomeText">
+          How can I assist you?
+        </h1>
+
+        <p id="assistantStatus">
+          Voice and command systems ready.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================================
+         COMMAND PANEL
+    ================================= -->
+
+    <section class="command-section">
+
+      <div class="command-box">
+
+        <input
+          id="commandInput"
+          type="text"
+          autocomplete="off"
+          placeholder="Type a command..."
+        >
+
+        <button
+          id="sendBtn"
+          type="button"
+          aria-label="Send command"
+        >
+          SEND
+        </button>
+
+      </div>
+
+
+      <button
+        id="micBtn"
+        class="mic-button"
+        type="button"
+        aria-label="Activate microphone"
+      >
+
+        <span class="mic-icon">
+          🎙
+        </span>
+
+        <span id="micText">
+          TAP TO SPEAK
+        </span>
+
+      </button>
+
+    </section>
+
+
+    <!-- ================================
+         QUICK COMMANDS
+    ================================= -->
+
+    <section class="quick-section">
+
+      <div class="section-title">
+        QUICK COMMANDS
+      </div>
+
+      <div class="quick-grid">
+
+        <button
+          class="quick-btn"
+          data-command="What time is it?"
+        >
+          <span>◷</span>
+          TIME
+        </button>
+
+        <button
+          class="quick-btn"
+          data-command="Tell me a joke"
+        >
+          <span>◉</span>
+          JOKE
+        </button>
+
+        <button
+          class="quick-btn"
+          data-command="Tell me about yourself"
+        >
+          <span>AI</span>
+          ABOUT
+        </button>
+
+        <button
+          class="quick-btn"
+          data-command="What can you do?"
+        >
+          <span>⚡</span>
+          CAPABILITIES
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================================
+         CONVERSATION
+    ================================= -->
+
+    <section class="conversation-section">
+
+      <div class="section-title">
+        CONVERSATION
+      </div>
+
+      <div
+        id="conversation"
+        class="conversation"
+      >
+
+        <div class="message titan-message">
+
+          <div class="message-label">
+            T.I.T.A.N.
+          </div>
+
+          <div class="message-content">
+            System initialized. I am ready for your command.
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================================
+         SYSTEM PANELS
+    ================================= -->
+
+    <section class="dashboard">
+
+      <div class="dashboard-card">
+
+        <div class="card-title">
+          CORE
+        </div>
+
+        <div class="card-value">
+          <span class="status-dot"></span>
+          ACTIVE
+        </div>
+
+      </div>
+
+
+      <div class="dashboard-card">
+
+        <div class="card-title">
+          VOICE
+        </div>
+
+        <div
+          id="voiceStatus"
+          class="card-value"
+        >
+          READY
+        </div>
+
+      </div>
+
+
+      <div class="dashboard-card">
+
+        <div class="card-title">
+          MEMORY
+        </div>
+
+        <div
+          id="memoryStatus"
+          class="card-value"
+        >
+          LOCAL
+        </div>
+
+      </div>
+
+
+      <div class="dashboard-card">
+
+        <div class="card-title">
+          NETWORK
+        </div>
+
+        <div class="card-value">
+          CONNECTED
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ================================
+         FOOTER
+    ================================= -->
+
+    <footer class="footer">
+
+      <div>
+        T.I.T.A.N. AI SYSTEM
+      </div>
+
+      <div>
+        V1.0
+      </div>
+
+    </footer>
+
+  </main>
+
+
+  <!-- ================================
+       JAVASCRIPT
+  ================================= -->
+
+  <script src="app.js"></script>
+
+</body>
+</html>
